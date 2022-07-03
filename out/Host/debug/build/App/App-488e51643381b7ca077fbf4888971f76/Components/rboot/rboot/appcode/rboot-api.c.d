@@ -1,0 +1,26 @@
+Components/rboot/rboot/appcode/rboot-api.o: \
+ /opt/sming/Sming/Components/rboot/rboot/appcode/rboot-api.c \
+ /opt/sming/Sming/System/include/c_types.h \
+ /opt/sming/Sming/Arch/Host/Components/spi_flash/include/esp_spi_flash.h \
+ /opt/sming/Sming/Arch/Esp8266/Components/spi_flash/include/esp_spi_flash.h \
+ /opt/sming/Sming/Arch/Esp8266/Components/esp8266/include/spi_flash.h \
+ /opt/sming/Sming/Arch/Host/Components/libc/include/esp_attr.h \
+ /opt/sming/Sming/Components/rboot/rboot/appcode/rboot-api.h \
+ /opt/sming/Sming/Components/rboot/rboot/rboot.h \
+ /opt/sming/Sming/Components/rboot/include/rboot-integration.h \
+ /opt/sming/Sming/Arch/Host/Components/esp_hal/include/esp_systemapi.h \
+ /opt/sming/Sming/System/include/sming_attr.h \
+ /opt/sming/Sming/Arch/Host/Components/esp_hal/include/esp_clk.h \
+ /opt/sming/Sming/Arch/Host/Components/esp_hal/include/esp_tasks.h \
+ /opt/sming/Sming/Arch/Host/Components/heap/include/heap.h \
+ /opt/sming/Sming/Arch/Host/Components/esp_hal/include/esp_system.h \
+ /opt/sming/Sming/Arch/Host/Components/driver/include/driver/gpio.h \
+ /opt/sming/Sming/Arch/Host/Components/driver/include/driver/adc.h \
+ /opt/sming/Sming/Arch/Host/Components/hostlib/hostapi.h \
+ /opt/sming/Sming/Arch/Host/Components/hostlib/include/hostlib/hostmsg.h \
+ /opt/sming/Sming/Arch/Host/Components/esp_hal/include/esp_sleep.h \
+ /opt/sming/Sming/System/include/m_printf.h \
+ /opt/sming/Sming/System/include/debug_progmem.h \
+ /opt/sming/Sming/Wiring/FakePgmSpace.h \
+ /opt/sming/Sming/Arch/Host/Components/libc/include/sys/pgmspace.h \
+ /opt/sming/Sming/System/include/stringutil.h

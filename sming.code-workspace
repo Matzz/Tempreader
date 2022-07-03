@@ -1,0 +1,29 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "terminal.integrated.defaultProfile.windows": "Command Prompt",
+        "files.associations": {
+            "*.hw": "jsonc",
+            "*.fwfs": "jsonc",
+            "optional": "cpp"
+        },
+        "json.schemas": [
+            {
+                "fileMatch": [
+                    "*.hw"
+                ],
+                "url": "file:///opt/sming/Sming/Components/Storage/schema.json"
+            },
+            {
+                "fileMatch": [
+                    "*.fwfs"
+                ],
+                "url": "file:///opt/sming/Sming/Components/IFS/fsbuild/schema.json"
+            }
+        ]
+    }
+}
