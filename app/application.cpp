@@ -1,8 +1,5 @@
 #include <SmingCore.h>
 #include <Libraries/DHTesp/DHTesp.h>
-#include <Storage/PartitionStream.h>
-#include <Storage/SpiFlash.h>
-#include <rboot-api.h>
 
 //#define WORK_PIN 14 // GPIO14
 #define WORK_PIN 14
@@ -14,7 +11,7 @@ Storage::Partition dataPart;
 
 void printCurrentData();
 void onTimer_readTemperatures();
-File data;
+std::unique_ptr<File> data;
 
 void init()
 {
@@ -31,14 +28,19 @@ void init()
 	} else {
 		debug_e("Error while mounting spiffs partition.");
 	}
+	data.reset(new File);
 
-	data.open(F("data.csv"), File::Append | File::ReadWrite);
+	if(!data->open(F("data.csv"), File::Create | File::Append | File::ReadWrite)) {
+		debug_e("File open failed: %s", data->getLastErrorString().c_str());
+	}
 	uint64_t time = RTC.getRtcNanoseconds();
 	String startString = "=== Start time: ";
 	startString.concat(time);
 	startString.concat("\n");
-	data.write(startString);
-	data.flush();
+	if(!data->write(startString)) {
+		debug_e("Write failed");
+	}
+	data->flush();
 	printCurrentData();
 
 	dht.setup(WORK_PIN, DHTesp::DHT22);
@@ -51,8 +53,8 @@ void init()
 void printCurrentData()
 {
 		Serial.println("Current data:");
-		data.seek(0, SeekOrigin::Start);
-		String c = data.getContent();
+		data->seek(0, SeekOrigin::Start);
+		String c = data->getContent();
 		Serial.println(c);
 		Serial.println("==== Data end");
 
@@ -75,13 +77,13 @@ void onTimer_readTemperatures()
 		dataString.concat(",");
 		dataString.concat(temperature);
 		dataString.concat("\n");
-		data.write(dataString);
-		data.flush();
+		data->write(dataString);
+		data->flush();
 		printCurrentData();
 
 	} else {
 		Serial.print("Failed to read from DHT: ");
-		Serial.print(dht.getStatus());
+		Serial.println(dht.getStatus());
 	}
 
 }
