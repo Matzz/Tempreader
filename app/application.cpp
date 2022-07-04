@@ -12,9 +12,32 @@ DHTesp dht;
 Timer readTemperatureProcTimer;
 Storage::Partition dataPart;
 
-void printCurrentData();
 void onTimer_readTemperatures();
-File data;
+
+File* getDataFile() {
+	auto data = new File;
+	data->open(F("data.csv"), File::Create | File::Append | File::ReadWrite);
+	return data;
+}
+
+void writeData(String dataToAppend) {
+	auto dataFile = getDataFile();
+	dataFile->write(dataToAppend);
+	dataFile->flush();
+	delete dataFile;
+}
+
+void printData()
+{
+		Serial.println("Current data:");
+		auto dataFile = getDataFile();
+		dataFile->seek(0, SeekOrigin::Start);
+		String c = dataFile->getContent();
+		Serial.println(c);
+		Serial.println("==== Data end");
+		delete dataFile;
+
+}
 
 void init()
 {
@@ -31,31 +54,19 @@ void init()
 	} else {
 		debug_e("Error while mounting spiffs partition.");
 	}
-
-	data.open(F("data.csv"), File::Append | File::ReadWrite);
+	
 	uint64_t time = RTC.getRtcNanoseconds();
 	String startString = "=== Start time: ";
 	startString.concat(time);
 	startString.concat("\n");
-	data.write(startString);
-	data.flush();
-	printCurrentData();
+	writeData(startString);
+	printData();
 
 	dht.setup(WORK_PIN, DHTesp::DHT22);
 	 // every so often.
 	readTemperatureProcTimer.initializeMs(5 * 1000, onTimer_readTemperatures).start();
 
 	Serial.println("\nStartup");
-}
-
-void printCurrentData()
-{
-		Serial.println("Current data:");
-		data.seek(0, SeekOrigin::Start);
-		String c = data.getContent();
-		Serial.println(c);
-		Serial.println("==== Data end");
-
 }
 
 void onTimer_readTemperatures()
@@ -75,13 +86,12 @@ void onTimer_readTemperatures()
 		dataString.concat(",");
 		dataString.concat(temperature);
 		dataString.concat("\n");
-		data.write(dataString);
-		data.flush();
-		printCurrentData();
+		writeData(dataString);
+		printData();
 
 	} else {
 		Serial.print("Failed to read from DHT: ");
 		Serial.print(dht.getStatus());
 	}
-
+	//System.deepSleep(15 * 1000);
 }
