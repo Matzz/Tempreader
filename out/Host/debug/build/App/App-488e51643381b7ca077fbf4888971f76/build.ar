@@ -1,6 +1,0 @@
-CREATE clib-App-488e51643381b7ca077fbf4888971f76.a
-ADDMOD app/application.o
-ADDMOD Components/rboot/rboot/appcode/rboot-bigflash.o
-ADDMOD Components/rboot/rboot/appcode/rboot-api.o
-SAVE
-END

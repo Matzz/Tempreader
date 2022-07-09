@@ -1,2 +1,0 @@
-   text	   data	    bss	    dec	    hex	filename
-  97952	   2596	   1504	 102052	  18ea4	out/Host/debug/firmware/app

@@ -4,8 +4,10 @@
 #include <Storage/SpiFlash.h>
 #include <rboot-api.h>
 
+
 //#define WORK_PIN 14 // GPIO14
 #define WORK_PIN 14
+#define MODE_PIN 5
 
 DHTesp dht;
 
@@ -29,20 +31,25 @@ void writeData(String dataToAppend) {
 
 void printData()
 {
-		Serial.println("Current data:");
-		auto dataFile = getDataFile();
-		dataFile->seek(0, SeekOrigin::Start);
-		String c = dataFile->getContent();
-		Serial.println(c);
-		Serial.println("==== Data end");
-		delete dataFile;
+	Serial.println("Current data:");
+	auto dataFile = getDataFile();
+	String c = dataFile->getContent();
+	Serial.println(c);
+	Serial.println("==== Data end");
+	delete dataFile;
 
 }
 
 void init()
 {
+	Serial.println("\nStartup.");
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
 	Serial.systemDebugOutput(true); // Allow debug output to serial
+	WifiStation.enable(false);
+	WifiAccessPoint.enable(false);
+	// System.deepSleep(1*1000);
+
+	pullup(MODE_PIN);
 
 	auto name = F("spiffs0");
 	dataPart = Storage::findPartition(F("spiffs0"));
@@ -50,7 +57,7 @@ void init()
 		debug_w("Partition '%s' not found", name);
 	}
 	if(spiffs_mount(dataPart)) {
-		debug_i("spiffs mounted");
+		debug_i("spif5fs mounted");
 	} else {
 		debug_e("Error while mounting spiffs partition.");
 	}
@@ -63,35 +70,44 @@ void init()
 	printData();
 
 	dht.setup(WORK_PIN, DHTesp::DHT22);
-	 // every so often.
-	readTemperatureProcTimer.initializeMs(5 * 1000, onTimer_readTemperatures).start();
 
-	Serial.println("\nStartup");
+	readTemperatureProcTimer.initializeMs(1 * 5000, onTimer_readTemperatures).start();
+	Serial.println("\nStartup end,");
 }
 
 void onTimer_readTemperatures()
 {
-	uint64_t time = RTC.getRtcNanoseconds();
-	if(dht.getStatus() == DHTesp::ERROR_NONE) {
-		String dataString = "";
-		float humidity = dht.getHumidity();
-		float temperature = dht.getTemperature();
+	auto mode = digitalRead(MODE_PIN);
+	Serial.printf("Sensor mode %d\n", mode);
+	if(mode == 1) {
+		Serial.println("\nReading sensors.");
+		uint64_t time = RTC.getRtcNanoseconds();
+		if(dht.getStatus() == DHTesp::ERROR_NONE) {
+			String dataString = "";
+			float humidity = dht.getHumidity();
+			float temperature = dht.getTemperature();
 
-		Serial.print("\tHumidity: ");
-		Serial.print(humidity);
-		Serial.print("% Temperature: ");
-		Serial.print(temperature);
-		Serial.print(" *C\n");
-		dataString.concat(humidity);
-		dataString.concat(",");
-		dataString.concat(temperature);
-		dataString.concat("\n");
-		writeData(dataString);
-		printData();
+			Serial.print("Humidity: ");
+			Serial.print(humidity);
+			Serial.print("% Temperature: ");
+			Serial.print(temperature);
+			Serial.print(" *C\n");
+			dataString.concat(humidity);
+			dataString.concat(",");
+			dataString.concat(temperature);
+			dataString.concat("\n");
+			writeData(dataString);
+			printData();
 
+		} else {
+			Serial.print("Failed to read from DHT: ");
+			Serial.print(dht.getStatus());
+		}
+		Serial.println("\nReading sensors end.");
 	} else {
-		Serial.print("Failed to read from DHT: ");
-		Serial.print(dht.getStatus());
+		Serial.println("\nPrinting sensors data.");
+		printData();
+		Serial.println("\nPrinting sensors data end.");
 	}
-	//System.deepSleep(15 * 1000);
+	System.deepSleep(15*1000);
 }
